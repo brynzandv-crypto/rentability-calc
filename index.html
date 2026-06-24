@@ -621,68 +621,74 @@
         }
 
         // ---------- Сохранение в Google Таблицу ----------
-        function saveToGoogleSheets() {
-            // Проверяем, что расчёт выполнен
-            if (!window._lastItems) {
-                calculate();
-            }
+       function saveToGoogleSheets() {
+    // Проверяем, что расчёт выполнен
+    if (!window._lastItems) {
+        calculate();
+    }
 
-            const project = projectSelect.value;
-            const month = monthSelect.options[monthSelect.selectedIndex].text;
-            const year = yearInput.value || '2026';
-            const now = new Date();
-            const dateStr = now.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
+    const project = projectSelect.value;
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const year = yearInput.value || '2026';
+    const now = new Date();
+    const dateStr = now.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
 
-            // Собираем все значения (вводимые + рассчитанные) в один массив объектов
-            // Для отправки нужен плоский объект: { project, month, year, date, ... все 17 пунктов }
-            const data = {
-                project: project,
-                month: month,
-                year: year,
-                date: dateStr
-            };
+    // Собираем данные
+    const data = {
+        project: project,
+        month: month,
+        year: year,
+        date: dateStr
+    };
 
-            // Добавляем все пункты из _lastItems (уже содержат и вводимые, и рассчитанные)
-            window._lastItems.forEach(item => {
-                // Используем label как ключ (заменяем пробелы на подчёркивания для безопасности)
-                const key = item.label.replace(/\s/g, '_').replace(/[()%]/g, '');
-                data[key] = item.value;
-            });
+    // Добавляем все 17 пунктов
+    window._lastItems.forEach(item => {
+        const key = item.label.replace(/\s/g, '_').replace(/[()%]/g, '');
+        data[key] = item.value;
+    });
 
-            // Также отдельно сохраним вводимые значения (может пригодиться)
-            const v = window._lastRawValues;
-            data.raw_turnover = v.turnover;
-            data.raw_salaryOperators = v.salaryOperators;
-            data.raw_salaryManagers = v.salaryManagers;
-            data.raw_coach = v.coach;
-            data.raw_monitoring = v.monitoring;
-            data.raw_training = v.training;
-            data.raw_salesSalaries = v.salesSalaries;
-            data.raw_salesCommission = v.salesCommission;
-            data.raw_employeesOktell = v.employeesOktell;
-            data.raw_employeesOffice = v.employeesOffice;
+    // Добавляем сырые вводимые значения (на случай, если понадобятся)
+    const v = window._lastRawValues;
+    data.raw_turnover = v.turnover;
+    data.raw_salaryOperators = v.salaryOperators;
+    data.raw_salaryManagers = v.salaryManagers;
+    data.raw_coach = v.coach;
+    data.raw_monitoring = v.monitoring;
+    data.raw_training = v.training;
+    data.raw_salesSalaries = v.salesSalaries;
+    data.raw_salesCommission = v.salesCommission;
+    data.raw_employeesOktell = v.employeesOktell;
+    data.raw_employeesOffice = v.employeesOffice;
 
-            // Отправляем POST-запрос на веб-приложение Google Apps Script
-            // ВАЖНО: замените URL на свой после публикации скрипта
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxG0uPhH_pHmq-yHpeFv3bVxkL2ZxEGFKtKK0ha1I9pxRLnY0H1p3xwskPNObvgrgPmug/exec';
+    // Убедитесь, что здесь правильный URL вашего веб-приложения
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxG0uPhH_pHmq-yHpeFv3bVxkL2ZxEGFKtKK0ha1I9pxRLnY0H1p3xwskPNObvgrgPmug/exec';
 
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors', // важно для кросс-доменных запросов
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                // При no-cors мы не можем прочитать ответ, поэтому просто показываем успех
-                showToast('✅ Данные успешно отправлены в Google Таблицу!', 'success');
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                showToast('❌ Ошибка при отправке. Проверьте URL скрипта.', 'error');
-            });
+    // Отправляем запрос без no-cors, чтобы можно было прочитать ответ
+    fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        // Пытаемся прочитать ответ как JSON
+        return response.json().then(json => ({ status: response.status, json }));
+    })
+    .then(({ status, json }) => {
+        console.log('Статус:', status);
+        console.log('Ответ от скрипта:', json);
+        if (json.result === 'success') {
+            showToast('✅ Данные успешно сохранены в Google Таблицу!', 'success');
+        } else {
+            showToast('❌ Ошибка: ' + (json.error || 'неизвестная'), 'error');
         }
+    })
+    .catch(error => {
+        console.error('Ошибка при отправке:', error);
+        showToast('❌ Ошибка соединения: ' + error.message, 'error');
+    });
+}
 
         // ---------- Уведомления ----------
         let toastTimeout = null;
