@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рентабельность проекта — калькулятор</title>
+    
+    <!-- Подключаем шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +18,7 @@
 
         body {
             font-family: 'Nunito', 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #f5f0f9; /* бледно-сиреневый */
+            background: #f5f0f9;
             padding: 30px 20px;
             display: flex;
             justify-content: center;
@@ -27,14 +32,22 @@
             box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
             padding: 35px 40px 45px;
             transition: 0.2s;
-            position: relative; /* для позиционирования логотипа */
+            position: relative;
         }
 
-        /* Логотип WS в правом верхнем углу */
-        <div class="ws-logo">
-    <img src="logo.png" alt="Логотип" style="height: 40px; width: auto;">
-</div>
-       
+        /* Стили для логотипа */
+        .ws-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            user-select: none;
+            pointer-events: none;
+        }
+        .ws-logo img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
 
         h1 {
             font-size: 28px;
@@ -60,7 +73,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px 30px;
-            background: #faf5fc; /* бледно-сиреневый для панели */
+            background: #faf5fc;
             padding: 16px 22px;
             border-radius: 16px;
             margin-bottom: 24px;
@@ -106,7 +119,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 18px 24px;
-            background: #faf5fc; /* бледно-сиреневый для блока ввода */
+            background: #faf5fc;
             padding: 22px 24px;
             border-radius: 18px;
             margin-bottom: 20px;
@@ -213,7 +226,7 @@
         }
 
         .btn-save {
-            background: #9b59b6; /* ярко-сиреневый для кнопки сохранения */
+            background: #9b59b6;
             color: white;
         }
         .btn-save:hover {
@@ -325,22 +338,25 @@
             .grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
             .result-table { font-size: 13px; }
             .top-panel { flex-direction: column; align-items: stretch; }
-            .ws-logo { font-size: 20px; top: 12px; right: 16px; }
+            .ws-logo { top: 12px; right: 16px; }
+            .ws-logo img { height: 30px; }
         }
         @media (max-width: 480px) {
             .grid { grid-template-columns: 1fr; }
             .action-panel { flex-direction: column; }
             .btn { justify-content: center; }
             .result-table td, .result-table th { padding-right: 6px; }
+            .ws-logo img { height: 25px; }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
-    <!-- Логотип WS -->
-    <div class="ws-logo">WS</div>
+    <!-- Логотип — вставьте сюда ваш PNG или SVG -->
+    <div class="ws-logo">
+        <img src="logo.png" alt="Логотип" style="height: 40px; width: auto;">
+    </div>
 
     <h1>📊 Рентабельность проекта</h1>
     <div class="subtitle">Введите данные — все расчёты обновляются автоматически</div>
@@ -502,13 +518,9 @@
         function calculate() {
             const v = getValues();
 
-            // Оборот за вычетом НДС+УСН (вычитаем 11% → остаётся 89%)
             const turnoverNet = v.turnover * 0.89;
-
-            // Управляющие: (оборот общий - (ЗП операторы + ЗП менеджеры + Тренер + Прослушка + Подготовка)) * 0.02
             const sumForManagers = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training;
             const managers = (v.turnover - sumForManagers) * 0.02;
-
             const rent = v.employeesOffice * 1850;
             const licenses = v.employeesOktell * 890;
             const salaryFund = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training + v.salesSalaries + v.salesCommission + managers;
@@ -563,9 +575,9 @@
                 } else {
                     let percent = 0;
                     if (item.label === 'Оборот за вычетом НДС+УСН (11%)') {
-                        percent = 1; // 100% (formatPercent умножит на 100)
+                        percent = 1;
                     } else if (turnoverNet !== 0) {
-                        percent = item.value / turnoverNet; // доля, без умножения на 100
+                        percent = item.value / turnoverNet;
                     }
                     tdPercent.textContent = formatPercent(percent);
                 }
@@ -593,7 +605,6 @@
             showToast('Все поля очищены', '');
         }
 
-        // ---------- Сохранение в Google Таблицу ----------
         function saveToGoogleSheets() {
             if (!window._lastItems) {
                 calculate();
@@ -649,7 +660,6 @@
             });
         }
 
-        // ---------- Уведомления ----------
         let toastTimeout = null;
         function showToast(message, type = '') {
             toast.textContent = message;
@@ -661,7 +671,6 @@
             }, 4000);
         }
 
-        // ---------- Инициализация ----------
         (function setDefaultPeriod() {
             const now = new Date();
             monthSelect.value = now.getMonth() + 1;
