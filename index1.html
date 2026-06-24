@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рентабельность проекта — калькулятор</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f4f7fc;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
+            padding: 35px 40px 45px;
+            transition: 0.2s;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0b2b4a;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subtitle {
+            color: #5a6f88;
+            font-size: 15px;
+            border-left: 4px solid #2b7be4;
+            padding-left: 16px;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        /* Панель выбора периода и проекта */
+        .top-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 30px;
+            background: #f9fbfd;
+            padding: 16px 22px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #e6edf4;
+            align-items: center;
+        }
+
+        .top-panel label {
+            font-weight: 500;
+            color: #1e3a5f;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-panel select,
+        .top-panel input[type="number"] {
+            padding: 8px 14px;
+            border: 1px solid #d5dfe9;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .top-panel select:focus,
+        .top-panel input[type="number"]:focus {
+            border-color: #2b7be4;
+            box-shadow: 0 0 0 3px rgba(43, 123, 228, 0.15);
+        }
+
+        .top-panel input[type="number"] {
+            width: 80px;
+        }
+
+        .top-panel select#projectSelect {
+            min-width: 140px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px 24px;
+            background: #f9fbfd;
+            padding: 22px 24px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border: 1px solid #e6edf4;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a5f;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .field-group label .unit {
+            font-weight: 400;
+            color: #6b85a0;
+            font-size: 12px;
+        }
+
+        .field-group input {
+            padding: 10px 14px;
+            border: 1px solid #d5dfe9;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #0a1e33;
+            background: white;
+            transition: 0.15s;
+            width: 100%;
+            outline: none;
+        }
+
+        .field-group input:focus {
+            border-color: #2b7be4;
+            box-shadow: 0 0 0 3px rgba(43, 123, 228, 0.15);
+        }
+
+        .field-group input:hover {
+            border-color: #a0b8cf;
+        }
+
+        .field-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .field-group input[type="number"]::-webkit-inner-spin-button,
+        .field-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .action-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 28px;
+            justify-content: flex-start;
+        }
+
+        .btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 600;
+            background: #e6edf4;
+            color: #1e3a5f;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #d0ddee;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 20, 40, 0.08);
+        }
+
+        .btn-primary {
+            background: #2b7be4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e66c9;
+        }
+
+        .btn-success {
+            background: #1f9d6a;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #178558;
+        }
+
+        .btn-danger {
+            background: #d95b5b;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c14242;
+        }
+
+        .btn-save {
+            background: #f5a623;
+            color: white;
+        }
+        .btn-save:hover {
+            background: #d48f1d;
+        }
+
+        .results {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #e6edf4;
+            padding: 22px 26px 26px;
+            margin-top: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .results h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0b2b4a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .result-table th {
+            text-align: left;
+            padding: 8px 12px 8px 0;
+            font-weight: 600;
+            color: #1e3a5f;
+            border-bottom: 2px solid #d5dfe9;
+        }
+
+        .result-table th:last-child {
+            text-align: right;
+        }
+
+        .result-table td {
+            padding: 7px 12px 7px 0;
+            border-bottom: 1px solid #eef3f8;
+            color: #0a1e33;
+        }
+
+        .result-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .result-table tr.total td {
+            border-top: 2px solid #cad8e8;
+            font-weight: 700;
+            background: #f8fafc;
+        }
+
+        .result-table tr.profit td {
+            font-weight: 700;
+            border-top: 2px solid #cad8e8;
+        }
+        .result-table tr.profit.positive td:last-child {
+            color: #1e6f3f;
+        }
+        .result-table tr.profit.negative td:last-child {
+            color: #b13a3a;
+        }
+
+        .result-table .highlight {
+            background: #f3f7fb;
+        }
+
+        .footer-note {
+            margin-top: 22px;
+            font-size: 13px;
+            color: #6f8aa8;
+            border-top: 1px solid #e6edf4;
+            padding-top: 18px;
+            text-align: right;
+        }
+
+        /* Уведомления */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e3a5f;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            background: #1f9d6a;
+        }
+        .toast.error {
+            background: #d95b5b;
+        }
+
+        @media (max-width: 680px) {
+            .container { padding: 20px 16px; }
+            .grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
+            .result-table { font-size: 13px; }
+            .top-panel { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+            .action-panel { flex-direction: column; }
+            .btn { justify-content: center; }
+            .result-table td, .result-table th { padding-right: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📊 Рентабельность проекта</h1>
+    <div class="subtitle">Введите данные — все расчёты обновляются автоматически</div>
+
+    <!-- Выбор проекта, месяца, года -->
+    <div class="top-panel">
+        <label>
+            Проект
+            <select id="projectSelect">
+                <option value="Дайсон">Дайсон</option>
+                <option value="Визовый">Визовый</option>
+                <option value="Финэкип">Финэкип</option>
+                <option value="Магнат">Магнат</option>
+            </select>
+        </label>
+        <label>
+            Месяц
+            <select id="monthSelect">
+                <option value="1">Январь</option>
+                <option value="2">Февраль</option>
+                <option value="3">Март</option>
+                <option value="4">Апрель</option>
+                <option value="5">Май</option>
+                <option value="6">Июнь</option>
+                <option value="7">Июль</option>
+                <option value="8">Август</option>
+                <option value="9">Сентябрь</option>
+                <option value="10">Октябрь</option>
+                <option value="11">Ноябрь</option>
+                <option value="12">Декабрь</option>
+            </select>
+        </label>
+        <label>
+            Год
+            <input type="number" id="yearInput" min="2000" max="2100" value="2026">
+        </label>
+    </div>
+
+    <!-- Блок ввода (все 11 вводимых полей) -->
+    <div class="grid" id="inputsGrid">
+        <div class="field-group">
+            <label>Оборот общий <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="turnover" value="1000000">
+        </div>
+        <div class="field-group">
+            <label>ЗП операторы <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="salaryOperators" value="120000">
+        </div>
+        <div class="field-group">
+            <label>ЗП менеджеры <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="salaryManagers" value="80000">
+        </div>
+        <div class="field-group">
+            <label>Тренер <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="coach" value="18000">
+        </div>
+        <div class="field-group">
+            <label>Прослушка <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="monitoring" value="10000">
+        </div>
+        <div class="field-group">
+            <label>Подготовка <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="training" value="15000">
+        </div>
+        <div class="field-group">
+            <label>Отдел продаж оклады <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="salesSalaries" value="70000">
+        </div>
+        <div class="field-group">
+            <label>Отдел продаж комиссия <span class="unit">(₽)</span></label>
+            <input type="number" step="0.01" id="salesCommission" value="45000">
+        </div>
+        <div class="field-group">
+            <label>Кол-во сотрудников (oktell) <span class="unit">(чел)</span></label>
+            <input type="number" step="1" id="employeesOktell" value="5">
+        </div>
+        <div class="field-group">
+            <label>Кол-во сотрудников офис <span class="unit">(чел)</span></label>
+            <input type="number" step="1" id="employeesOffice" value="12">
+        </div>
+        <!-- Поле "отдел продаж премия" удалено согласно уточнению -->
+    </div>
+
+    <!-- Панель кнопок -->
+    <div class="action-panel">
+        <button class="btn btn-primary" id="calcBtn">🧮 Рассчитать</button>
+        <button class="btn btn-danger" id="clearBtn">🗑️ Очистить</button>
+        <button class="btn btn-save" id="saveBtn">💾 Сохранить в Google Таблицу</button>
+    </div>
+
+    <!-- Результаты (таблица) -->
+    <div class="results" id="resultsBlock">
+        <h2>🧮 Расчётные показатели</h2>
+        <table class="result-table" id="resultTable">
+            <thead>
+                <tr>
+                    <th>Показатель</th>
+                    <th style="text-align:right;">Сумма (₽)</th>
+                    <th style="text-align:right;">% от оборота за вычетом</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody">
+                <!-- заполняется скриптом -->
+            </tbody>
+        </table>
+        <div class="footer-note">
+            * Оборот за вычетом = общий оборот минус 20% (НДС+УСН).<br>
+            Налоги считаются по ставке 20% от ФОТ (включая управляющих).
+        </div>
+    </div>
+</div>
+
+<!-- Всплывающее уведомление -->
+<div id="toast" class="toast"></div>
+
+<script>
+    (function() {
+        // ---------- Элементы ----------
+        const inputs = {
+            turnover: document.getElementById('turnover'),
+            salaryOperators: document.getElementById('salaryOperators'),
+            salaryManagers: document.getElementById('salaryManagers'),
+            coach: document.getElementById('coach'),
+            monitoring: document.getElementById('monitoring'),
+            training: document.getElementById('training'),
+            salesSalaries: document.getElementById('salesSalaries'),
+            salesCommission: document.getElementById('salesCommission'),
+            employeesOktell: document.getElementById('employeesOktell'),
+            employeesOffice: document.getElementById('employeesOffice')
+        };
+
+        const projectSelect = document.getElementById('projectSelect');
+        const monthSelect = document.getElementById('monthSelect');
+        const yearInput = document.getElementById('yearInput');
+        const resultBody = document.getElementById('resultBody');
+        const calcBtn = document.getElementById('calcBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const toast = document.getElementById('toast');
+
+        // ---------- Вспомогательные функции ----------
+        function formatMoney(value) {
+            if (isNaN(value)) return '0.00';
+            const rounded = Math.round(value * 100) / 100;
+            return rounded.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatPercent(value) {
+            if (isNaN(value)) return '0.00%';
+            const rounded = Math.round(value * 10000) / 100;
+            return rounded.toFixed(2) + '%';
+        }
+
+        function getValues() {
+            return {
+                turnover: parseFloat(inputs.turnover.value) || 0,
+                salaryOperators: parseFloat(inputs.salaryOperators.value) || 0,
+                salaryManagers: parseFloat(inputs.salaryManagers.value) || 0,
+                coach: parseFloat(inputs.coach.value) || 0,
+                monitoring: parseFloat(inputs.monitoring.value) || 0,
+                training: parseFloat(inputs.training.value) || 0,
+                salesSalaries: parseFloat(inputs.salesSalaries.value) || 0,
+                salesCommission: parseFloat(inputs.salesCommission.value) || 0,
+                employeesOktell: parseInt(inputs.employeesOktell.value, 10) || 0,
+                employeesOffice: parseInt(inputs.employeesOffice.value, 10) || 0
+            };
+        }
+
+        // ---------- Основной расчёт ----------
+        function calculate() {
+            const v = getValues();
+
+            // 1. Оборот общий (уже есть)
+            // 2. Оборот за вычетом НДС+УСН (вычитаем 20%)
+            const turnoverNet = v.turnover * 0.8;
+
+            // 14. Управляющие: (оборот общий - (ЗП операторы + ЗП менеджеры + Тренер + Прослушка + Подготовка)) * 0.02
+            const sumForManagers = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training;
+            const managers = (v.turnover - sumForManagers) * 0.02;
+
+            // 12. Аренда: кол-во офис * 1850
+            const rent = v.employeesOffice * 1850;
+
+            // 13. Лицензии Oktell: кол-во oktell * 890
+            const licenses = v.employeesOktell * 890;
+
+            // 15. Налоги с зарплат: (ЗП операторы + ЗП менеджеры + Тренер + Прослушка + Подготовка + Отдел продаж оклады + Отдел продаж комиссия + Управляющие) * 0.2
+            const salaryFund = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training + v.salesSalaries + v.salesCommission + managers;
+            const taxes = salaryFund * 0.20;
+
+            // 16. Итого расходы: сумма пунктов с 3 по 15 (все, кроме оборотов)
+            const totalExpenses = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training + v.salesSalaries + v.salesCommission + rent + licenses + managers + taxes;
+
+            // 17. Прибыль: оборот за вычетом - итого расходы
+            const profit = turnoverNet - totalExpenses;
+
+            // Формируем массив всех 17 пунктов в порядке, указанном в таблице
+            const items = [
+                { label: 'Оборот общий', value: v.turnover, isCount: false },
+                { label: 'Оборот за вычетом НДС+УСН (20%)', value: turnoverNet, isCount: false },
+                { label: 'ЗП операторы', value: v.salaryOperators, isCount: false },
+                { label: 'ЗП менеджеры', value: v.salaryManagers, isCount: false },
+                { label: 'Тренер', value: v.coach, isCount: false },
+                { label: 'Прослушка', value: v.monitoring, isCount: false },
+                { label: 'Подготовка', value: v.training, isCount: false },
+                { label: 'Отдел продаж оклады', value: v.salesSalaries, isCount: false },
+                { label: 'Отдел продаж комиссия', value: v.salesCommission, isCount: false },
+                { label: 'Кол-во сотрудников (oktell)', value: v.employeesOktell, isCount: true },
+                { label: 'Кол-во сотрудников офис', value: v.employeesOffice, isCount: true },
+                { label: 'Аренда', value: rent, isCount: false },
+                { label: 'Лицензии Oktell', value: licenses, isCount: false },
+                { label: 'Управляющие', value: managers, isCount: false },
+                { label: 'Налоги с зарплат', value: taxes, isCount: false },
+                { label: 'Итого расходы', value: totalExpenses, isCount: false, isTotal: true },
+                { label: 'Прибыль', value: profit, isCount: false, isProfit: true }
+            ];
+
+            // Заполняем таблицу
+            resultBody.innerHTML = '';
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                if (item.isTotal) tr.classList.add('total');
+                if (item.isProfit) {
+                    tr.classList.add('profit');
+                    tr.classList.add(profit >= 0 ? 'positive' : 'negative');
+                }
+
+                const tdLabel = document.createElement('td');
+                tdLabel.textContent = item.label;
+
+                const tdValue = document.createElement('td');
+                tdValue.style.textAlign = 'right';
+                if (item.isCount) {
+                    tdValue.textContent = item.value;
+                } else {
+                    tdValue.textContent = formatMoney(item.value);
+                }
+
+                const tdPercent = document.createElement('td');
+                tdPercent.style.textAlign = 'right';
+                if (item.isCount) {
+                    tdPercent.textContent = '—';
+                } else {
+                    let percent = 0;
+                    if (item.label === 'Оборот за вычетом НДС+УСН (20%)') {
+                        percent = 100;
+                    } else if (turnoverNet !== 0) {
+                        percent = (item.value / turnoverNet) * 100;
+                    }
+                    tdPercent.textContent = formatPercent(percent);
+                }
+
+                tr.appendChild(tdLabel);
+                tr.appendChild(tdValue);
+                tr.appendChild(tdPercent);
+                resultBody.appendChild(tr);
+            });
+
+            // Сохраняем все значения для отправки
+            window._lastItems = items;
+            window._lastTurnoverNet = turnoverNet;
+            window._lastProfit = profit;
+            window._lastRawValues = v; // вводимые значения
+        }
+
+        // ---------- Очистка ----------
+        function clearAll() {
+            for (let key in inputs) {
+                inputs[key].value = 0;
+            }
+            const now = new Date();
+            monthSelect.value = now.getMonth() + 1;
+            yearInput.value = now.getFullYear();
+            calculate();
+            showToast('Все поля очищены', '');
+        }
+
+        // ---------- Сохранение в Google Таблицу ----------
+       function saveToGoogleSheets() {
+    // Проверяем, что расчёт выполнен
+    if (!window._lastItems) {
+        calculate();
+    }
+
+    const project = projectSelect.value;
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const year = yearInput.value || '2026';
+    const now = new Date();
+    const dateStr = now.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
+
+    // Собираем данные
+    const data = {
+        project: project,
+        month: month,
+        year: year,
+        date: dateStr
+    };
+
+    // Добавляем все 17 пунктов
+    window._lastItems.forEach(item => {
+        const key = item.label.replace(/\s/g, '_').replace(/[()%]/g, '');
+        data[key] = item.value;
+    });
+
+    // Добавляем сырые вводимые значения (на случай, если понадобятся)
+    const v = window._lastRawValues;
+    data.raw_turnover = v.turnover;
+    data.raw_salaryOperators = v.salaryOperators;
+    data.raw_salaryManagers = v.salaryManagers;
+    data.raw_coach = v.coach;
+    data.raw_monitoring = v.monitoring;
+    data.raw_training = v.training;
+    data.raw_salesSalaries = v.salesSalaries;
+    data.raw_salesCommission = v.salesCommission;
+    data.raw_employeesOktell = v.employeesOktell;
+    data.raw_employeesOffice = v.employeesOffice;
+
+    // Убедитесь, что здесь правильный URL вашего веб-приложения
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyp9XYJ6EUfJV2YV0M58x2sxxB_VFDC6vle5pjRevSf2Lg7IsfVctLwfTAihW1JBytR9w/exec';
+
+    // Отправляем запрос без no-cors, чтобы можно было прочитать ответ
+    fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        // Пытаемся прочитать ответ как JSON
+        return response.json().then(json => ({ status: response.status, json }));
+    })
+    .then(({ status, json }) => {
+        console.log('Статус:', status);
+        console.log('Ответ от скрипта:', json);
+        if (json.result === 'success') {
+            showToast('✅ Данные успешно сохранены в Google Таблицу!', 'success');
+        } else {
+            showToast('❌ Ошибка: ' + (json.error || 'неизвестная'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка при отправке:', error);
+        showToast('❌ Ошибка соединения: ' + error.message, 'error');
+    });
+}
+
+        // ---------- Уведомления ----------
+        let toastTimeout = null;
+        function showToast(message, type = '') {
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type) toast.classList.add(type);
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ---------- Инициализация ----------
+        (function setDefaultPeriod() {
+            const now = new Date();
+            monthSelect.value = now.getMonth() + 1;
+            yearInput.value = now.getFullYear();
+        })();
+
+        // Авто-пересчёт при изменении полей
+        for (let key in inputs) {
+            inputs[key].addEventListener('input', calculate);
+            inputs[key].addEventListener('change', calculate);
+        }
+
+        calcBtn.addEventListener('click', calculate);
+        clearBtn.addEventListener('click', clearAll);
+        saveBtn.addEventListener('click', saveToGoogleSheets);
+
+        // Первоначальный расчёт
+        calculate();
+    })();
+</script>
+
+</body>
+</html>
