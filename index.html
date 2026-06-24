@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #f4f7fc;
+            background: #f5f0f9; /* бледно-сиреневый */
             padding: 30px 20px;
             display: flex;
             justify-content: center;
@@ -27,6 +27,21 @@
             box-shadow: 0 20px 60px rgba(0, 20, 40, 0.12);
             padding: 35px 40px 45px;
             transition: 0.2s;
+            position: relative; /* для позиционирования логотипа */
+        }
+
+        /* Логотип WS в правом верхнем углу */
+        .ws-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #9b59b6; /* ярко-сиреневый */
+            letter-spacing: 1px;
+            opacity: 0.7;
+            user-select: none;
+            pointer-events: none;
         }
 
         h1 {
@@ -53,11 +68,11 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px 30px;
-            background: #f9fbfd;
+            background: #faf5fc; /* бледно-сиреневый для панели */
             padding: 16px 22px;
             border-radius: 16px;
             margin-bottom: 24px;
-            border: 1px solid #e6edf4;
+            border: 1px solid #e6d9ed;
             align-items: center;
         }
 
@@ -99,11 +114,11 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 18px 24px;
-            background: #f9fbfd;
+            background: #faf5fc; /* бледно-сиреневый для блока ввода */
             padding: 22px 24px;
             border-radius: 18px;
             margin-bottom: 20px;
-            border: 1px solid #e6edf4;
+            border: 1px solid #e6d9ed;
         }
 
         .field-group {
@@ -197,14 +212,6 @@
             background: #1e66c9;
         }
 
-        .btn-success {
-            background: #1f9d6a;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #178558;
-        }
-
         .btn-danger {
             background: #d95b5b;
             color: white;
@@ -214,11 +221,11 @@
         }
 
         .btn-save {
-            background: #f5a623;
+            background: #9b59b6; /* ярко-сиреневый для кнопки сохранения */
             color: white;
         }
         .btn-save:hover {
-            background: #d48f1d;
+            background: #8e44ad;
         }
 
         .results {
@@ -326,6 +333,7 @@
             .grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
             .result-table { font-size: 13px; }
             .top-panel { flex-direction: column; align-items: stretch; }
+            .ws-logo { font-size: 20px; top: 12px; right: 16px; }
         }
         @media (max-width: 480px) {
             .grid { grid-template-columns: 1fr; }
@@ -338,6 +346,9 @@
 <body>
 
 <div class="container">
+    <!-- Логотип WS -->
+    <div class="ws-logo">WS</div>
+
     <h1>📊 Рентабельность проекта</h1>
     <div class="subtitle">Введите данные — все расчёты обновляются автоматически</div>
 
@@ -436,7 +447,7 @@
             <tbody id="resultBody"></tbody>
         </table>
         <div class="footer-note">
-            * Оборот за вычетом = общий оборот минус 20% (НДС+УСН).<br>
+            * Оборот за вычетом = общий оборот минус 11% (НДС+УСН).<br>
             Налоги считаются по ставке 20% от ФОТ (включая управляющих).
         </div>
     </div>
@@ -498,9 +509,13 @@
         function calculate() {
             const v = getValues();
 
-            const turnoverNet = v.turnover * 0.8;
+            // Оборот за вычетом НДС+УСН (вычитаем 11% → остаётся 89%)
+            const turnoverNet = v.turnover * 0.89;
+
+            // Управляющие: (оборот общий - (ЗП операторы + ЗП менеджеры + Тренер + Прослушка + Подготовка)) * 0.02
             const sumForManagers = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training;
             const managers = (v.turnover - sumForManagers) * 0.02;
+
             const rent = v.employeesOffice * 1850;
             const licenses = v.employeesOktell * 890;
             const salaryFund = v.salaryOperators + v.salaryManagers + v.coach + v.monitoring + v.training + v.salesSalaries + v.salesCommission + managers;
@@ -510,7 +525,7 @@
 
             const items = [
                 { label: 'Оборот общий', value: v.turnover, isCount: false },
-                { label: 'Оборот за вычетом НДС+УСН (20%)', value: turnoverNet, isCount: false },
+                { label: 'Оборот за вычетом НДС+УСН (11%)', value: turnoverNet, isCount: false },
                 { label: 'ЗП операторы', value: v.salaryOperators, isCount: false },
                 { label: 'ЗП менеджеры', value: v.salaryManagers, isCount: false },
                 { label: 'Тренер', value: v.coach, isCount: false },
@@ -554,10 +569,10 @@
                     tdPercent.textContent = '—';
                 } else {
                     let percent = 0;
-                    if (item.label === 'Оборот за вычетом НДС+УСН (20%)') {
-                        percent = 100;
+                    if (item.label === 'Оборот за вычетом НДС+УСН (11%)') {
+                        percent = 1; // 100% (formatPercent умножит на 100)
                     } else if (turnoverNet !== 0) {
-                        percent = (item.value / turnoverNet) * 100;
+                        percent = item.value / turnoverNet; // доля, без умножения на 100
                     }
                     tdPercent.textContent = formatPercent(percent);
                 }
@@ -585,7 +600,7 @@
             showToast('Все поля очищены', '');
         }
 
-        // ---------- Сохранение в Google Таблицу (исправленное) ----------
+        // ---------- Сохранение в Google Таблицу ----------
         function saveToGoogleSheets() {
             if (!window._lastItems) {
                 calculate();
