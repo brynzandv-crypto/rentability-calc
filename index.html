@@ -25,7 +25,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             width: 100%;
             background: #ffffff;
             border-radius: 28px;
@@ -35,7 +35,7 @@
             position: relative;
         }
 
-        /* Стили для логотипа */
+        /* Логотип */
         .ws-logo {
             position: absolute;
             top: 20px;
@@ -44,7 +44,7 @@
             pointer-events: none;
         }
         .ws-logo img {
-            height: 80px;
+            height: 40px;
             width: auto;
             display: block;
         }
@@ -67,6 +67,42 @@
             padding-left: 16px;
             margin-bottom: 28px;
             line-height: 1.5;
+        }
+
+        /* Вкладки */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e6d9ed;
+            padding-bottom: 4px;
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6b85a0;
+            cursor: pointer;
+            border-radius: 12px 12px 0 0;
+            transition: 0.2s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .tab-btn:hover {
+            background: #faf5fc;
+            color: #1e3a5f;
+        }
+        .tab-btn.active {
+            background: #faf5fc;
+            color: #2b7be4;
+            border-bottom: 3px solid #2b7be4;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
 
         .top-panel {
@@ -233,6 +269,14 @@
             background: #8e44ad;
         }
 
+        .btn-analytics {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-analytics:hover {
+            background: #27ae60;
+        }
+
         .results {
             background: #ffffff;
             border-radius: 18px;
@@ -256,6 +300,14 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .result-table thead,
+        .result-table tbody {
+            display: table;
+            width: 100%;
         }
 
         .result-table th {
@@ -264,10 +316,12 @@
             font-weight: 600;
             color: #1e3a5f;
             border-bottom: 2px solid #d5dfe9;
+            white-space: nowrap;
         }
 
-        .result-table th:last-child {
+        .result-table th:not(:first-child) {
             text-align: right;
+            min-width: 120px;
         }
 
         .result-table td {
@@ -276,9 +330,10 @@
             color: #0a1e33;
         }
 
-        .result-table td:last-child {
+        .result-table td:not(:first-child) {
             text-align: right;
             font-weight: 500;
+            min-width: 120px;
         }
 
         .result-table tr.total td {
@@ -291,11 +346,36 @@
             font-weight: 700;
             border-top: 2px solid #cad8e8;
         }
-        .result-table tr.profit.positive td:last-child {
+        .result-table tr.profit.positive td {
             color: #1e6f3f;
         }
-        .result-table tr.profit.negative td:last-child {
+        .result-table tr.profit.negative td {
             color: #b13a3a;
+        }
+
+        .analytics-controls {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .analytics-controls label {
+            font-weight: 500;
+            color: #1e3a5f;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .analytics-controls select {
+            padding: 8px 14px;
+            border: 1px solid #d5dfe9;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            outline: none;
+            font-weight: 500;
         }
 
         .footer-note {
@@ -333,6 +413,13 @@
             background: #d95b5b;
         }
 
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b85a0;
+            font-size: 16px;
+        }
+
         @media (max-width: 680px) {
             .container { padding: 20px 16px; }
             .grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
@@ -340,6 +427,9 @@
             .top-panel { flex-direction: column; align-items: stretch; }
             .ws-logo { top: 12px; right: 16px; }
             .ws-logo img { height: 30px; }
+            .tabs { flex-direction: column; border-bottom: none; }
+            .tab-btn { border-radius: 8px; text-align: left; }
+            .tab-btn.active { border-bottom: none; background: #faf5fc; }
         }
         @media (max-width: 480px) {
             .grid { grid-template-columns: 1fr; }
@@ -347,13 +437,18 @@
             .btn { justify-content: center; }
             .result-table td, .result-table th { padding-right: 6px; }
             .ws-logo img { height: 25px; }
+            .result-table td:not(:first-child),
+            .result-table th:not(:first-child) {
+                min-width: 80px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Логотип — вставьте сюда ваш PNG или SVG -->
+    <!-- Логотип -->
     <div class="ws-logo">
         <img src="logo.png" alt="Логотип" style="height: 40px; width: auto;">
     </div>
@@ -361,103 +456,142 @@
     <h1>📊 Рентабельность проекта</h1>
     <div class="subtitle">Введите данные — все расчёты обновляются автоматически</div>
 
-    <div class="top-panel">
-        <label>
-            Проект
-            <select id="projectSelect">
-                <option value="Дайсон">Дайсон</option>
-                <option value="Визовый">Визовый</option>
-                <option value="Финэкип">Финэкип</option>
-                <option value="Магнат">Магнат</option>
-            </select>
-        </label>
-        <label>
-            Месяц
-            <select id="monthSelect">
-                <option value="1">Январь</option>
-                <option value="2">Февраль</option>
-                <option value="3">Март</option>
-                <option value="4">Апрель</option>
-                <option value="5">Май</option>
-                <option value="6">Июнь</option>
-                <option value="7">Июль</option>
-                <option value="8">Август</option>
-                <option value="9">Сентябрь</option>
-                <option value="10">Октябрь</option>
-                <option value="11">Ноябрь</option>
-                <option value="12">Декабрь</option>
-            </select>
-        </label>
-        <label>
-            Год
-            <input type="number" id="yearInput" min="2000" max="2100" value="2026">
-        </label>
+    <!-- Вкладки -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="calculator">📝 Калькулятор</button>
+        <button class="tab-btn" data-tab="analytics">📈 Аналитика</button>
     </div>
 
-    <div class="grid" id="inputsGrid">
-        <div class="field-group">
-            <label>Оборот общий <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="turnover" value="1000000">
+    <!-- Вкладка: Калькулятор -->
+    <div id="tab-calculator" class="tab-content active">
+        <div class="top-panel">
+            <label>
+                Проект
+                <select id="projectSelect">
+                    <option value="Дайсон">Дайсон</option>
+                    <option value="Визовый">Визовый</option>
+                    <option value="Финэкип">Финэкип</option>
+                    <option value="Магнат">Магнат</option>
+                </select>
+            </label>
+            <label>
+                Месяц
+                <select id="monthSelect">
+                    <option value="1">Январь</option>
+                    <option value="2">Февраль</option>
+                    <option value="3">Март</option>
+                    <option value="4">Апрель</option>
+                    <option value="5">Май</option>
+                    <option value="6">Июнь</option>
+                    <option value="7">Июль</option>
+                    <option value="8">Август</option>
+                    <option value="9">Сентябрь</option>
+                    <option value="10">Октябрь</option>
+                    <option value="11">Ноябрь</option>
+                    <option value="12">Декабрь</option>
+                </select>
+            </label>
+            <label>
+                Год
+                <input type="number" id="yearInput" min="2000" max="2100" value="2026">
+            </label>
         </div>
-        <div class="field-group">
-            <label>ЗП операторы <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="salaryOperators" value="120000">
+
+        <div class="grid" id="inputsGrid">
+            <div class="field-group">
+                <label>Оборот общий <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="turnover" value="1000000">
+            </div>
+            <div class="field-group">
+                <label>ЗП операторы <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="salaryOperators" value="120000">
+            </div>
+            <div class="field-group">
+                <label>ЗП менеджеры <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="salaryManagers" value="80000">
+            </div>
+            <div class="field-group">
+                <label>Тренер <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="coach" value="18000">
+            </div>
+            <div class="field-group">
+                <label>Прослушка <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="monitoring" value="10000">
+            </div>
+            <div class="field-group">
+                <label>Подготовка <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="training" value="15000">
+            </div>
+            <div class="field-group">
+                <label>Отдел продаж оклады <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="salesSalaries" value="70000">
+            </div>
+            <div class="field-group">
+                <label>Отдел продаж комиссия <span class="unit">(₽)</span></label>
+                <input type="number" step="0.01" id="salesCommission" value="45000">
+            </div>
+            <div class="field-group">
+                <label>Кол-во сотрудников (oktell) <span class="unit">(чел)</span></label>
+                <input type="number" step="1" id="employeesOktell" value="5">
+            </div>
+            <div class="field-group">
+                <label>Кол-во сотрудников офис <span class="unit">(чел)</span></label>
+                <input type="number" step="1" id="employeesOffice" value="12">
+            </div>
         </div>
-        <div class="field-group">
-            <label>ЗП менеджеры <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="salaryManagers" value="80000">
+
+        <div class="action-panel">
+            <button class="btn btn-primary" id="calcBtn">🧮 Рассчитать</button>
+            <button class="btn btn-danger" id="clearBtn">🗑️ Очистить</button>
+            <button class="btn btn-save" id="saveBtn">💾 Сохранить в Google Таблицу</button>
         </div>
-        <div class="field-group">
-            <label>Тренер <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="coach" value="18000">
-        </div>
-        <div class="field-group">
-            <label>Прослушка <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="monitoring" value="10000">
-        </div>
-        <div class="field-group">
-            <label>Подготовка <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="training" value="15000">
-        </div>
-        <div class="field-group">
-            <label>Отдел продаж оклады <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="salesSalaries" value="70000">
-        </div>
-        <div class="field-group">
-            <label>Отдел продаж комиссия <span class="unit">(₽)</span></label>
-            <input type="number" step="0.01" id="salesCommission" value="45000">
-        </div>
-        <div class="field-group">
-            <label>Кол-во сотрудников (oktell) <span class="unit">(чел)</span></label>
-            <input type="number" step="1" id="employeesOktell" value="5">
-        </div>
-        <div class="field-group">
-            <label>Кол-во сотрудников офис <span class="unit">(чел)</span></label>
-            <input type="number" step="1" id="employeesOffice" value="12">
+
+        <div class="results" id="resultsBlock">
+            <h2>🧮 Расчётные показатели</h2>
+            <div style="overflow-x: auto;">
+                <table class="result-table" id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th style="text-align:right;">Сумма (₽)</th>
+                            <th style="text-align:right;">% от оборота за вычетом</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+            <div class="footer-note">
+                * Оборот за вычетом = общий оборот минус 11% (НДС+УСН).<br>
+                Налоги считаются по ставке 20% от ФОТ (включая управляющих).
+            </div>
         </div>
     </div>
 
-    <div class="action-panel">
-        <button class="btn btn-primary" id="calcBtn">🧮 Рассчитать</button>
-        <button class="btn btn-danger" id="clearBtn">🗑️ Очистить</button>
-        <button class="btn btn-save" id="saveBtn">💾 Сохранить в Google Таблицу</button>
-    </div>
+    <!-- Вкладка: Аналитика -->
+    <div id="tab-analytics" class="tab-content">
+        <div class="analytics-controls">
+            <label>
+                Проект
+                <select id="analyticsProjectFilter">
+                    <option value="all">Все проекты</option>
+                    <option value="Дайсон">Дайсон</option>
+                    <option value="Визовый">Визовый</option>
+                    <option value="Финэкип">Финэкип</option>
+                    <option value="Магнат">Магнат</option>
+                </select>
+            </label>
+            <button class="btn btn-analytics" id="loadAnalyticsBtn">🔄 Загрузить данные</button>
+        </div>
 
-    <div class="results" id="resultsBlock">
-        <h2>🧮 Расчётные показатели</h2>
-        <table class="result-table" id="resultTable">
-            <thead>
-                <tr>
-                    <th>Показатель</th>
-                    <th style="text-align:right;">Сумма (₽)</th>
-                    <th style="text-align:right;">% от оборота за вычетом</th>
-                </tr>
-            </thead>
-            <tbody id="resultBody"></tbody>
-        </table>
-        <div class="footer-note">
-            * Оборот за вычетом = общий оборот минус 11% (НДС+УСН).<br>
-            Налоги считаются по ставке 20% от ФОТ (включая управляющих).
+        <div class="results">
+            <h2>📈 Сводная аналитика</h2>
+            <div id="analyticsContainer">
+                <div class="loading">Нажмите «Загрузить данные», чтобы получить отчёт</div>
+            </div>
+            <div class="footer-note">
+                * Данные подгружаются из Google Таблицы.<br>
+                Для каждого показателя отображается сумма и % от оборота за вычетом.
+            </div>
         </div>
     </div>
 </div>
@@ -466,6 +600,7 @@
 
 <script>
     (function() {
+        // ---------- Элементы ----------
         const inputs = {
             turnover: document.getElementById('turnover'),
             salaryOperators: document.getElementById('salaryOperators'),
@@ -488,6 +623,27 @@
         const saveBtn = document.getElementById('saveBtn');
         const toast = document.getElementById('toast');
 
+        // Элементы для аналитики
+        const analyticsContainer = document.getElementById('analyticsContainer');
+        const loadAnalyticsBtn = document.getElementById('loadAnalyticsBtn');
+        const analyticsProjectFilter = document.getElementById('analyticsProjectFilter');
+
+        // Вкладки
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // ---------- Работа с вкладками ----------
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + tabId).classList.add('active');
+            });
+        });
+
+        // ---------- Вспомогательные функции ----------
         function formatMoney(value) {
             if (isNaN(value)) return '0.00';
             const rounded = Math.round(value * 100) / 100;
@@ -515,6 +671,7 @@
             };
         }
 
+        // ---------- Основной расчёт ----------
         function calculate() {
             const v = getValues();
 
@@ -594,6 +751,7 @@
             window._lastRawValues = v;
         }
 
+        // ---------- Очистка ----------
         function clearAll() {
             for (let key in inputs) {
                 inputs[key].value = 0;
@@ -605,6 +763,7 @@
             showToast('Все поля очищены', '');
         }
 
+        // ---------- Сохранение в Google Таблицу ----------
         function saveToGoogleSheets() {
             if (!window._lastItems) {
                 calculate();
@@ -660,6 +819,178 @@
             });
         }
 
+        // ---------- Загрузка аналитики ----------
+        function loadAnalytics() {
+            analyticsContainer.innerHTML = '<div class="loading">⏳ Загрузка данных...</div>';
+            
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
+
+            fetch(scriptURL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                renderAnalytics(data);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки:', error);
+                analyticsContainer.innerHTML = `
+                    <div class="loading" style="color: #d95b5b;">
+                        ❌ Ошибка загрузки данных: ${error.message}<br>
+                        <small>Проверьте, что скрипт Google Apps Script опубликован и доступен.</small>
+                    </div>
+                `;
+                showToast('❌ Ошибка загрузки аналитики', 'error');
+            });
+        }
+
+        // ---------- Отрисовка аналитики ----------
+        function renderAnalytics(data) {
+            const headers = data.headers;
+            const rows = data.rows;
+
+            if (!headers || headers.length === 0 || rows.length === 0) {
+                analyticsContainer.innerHTML = '<div class="loading">📭 Нет данных для отображения. Сначала сохраните расчёты.</div>';
+                return;
+            }
+
+            // Фильтр по проекту
+            const filterProject = analyticsProjectFilter.value;
+            
+            // Находим индексы столбцов с проектами
+            const projectColumns = [];
+            const projectNames = [];
+            for (let i = 0; i < headers.length; i++) {
+                const header = headers[i];
+                if (header && header !== 'Показатель' && header !== 'Дата сохранения') {
+                    // Формат: "Дайсон, Март 2026"
+                    const projectMatch = header.match(/^([^,]+)/);
+                    if (projectMatch) {
+                        const projectName = projectMatch[1].trim();
+                        if (filterProject === 'all' || filterProject === projectName) {
+                            projectColumns.push(i);
+                            projectNames.push(header);
+                        }
+                    }
+                }
+            }
+
+            if (projectColumns.length === 0) {
+                analyticsContainer.innerHTML = `
+                    <div class="loading">
+                        📭 Нет данных для выбранного проекта.
+                        ${filterProject !== 'all' ? `Проект "${filterProject}" пока не сохранён.` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            // Строим таблицу
+            let tableHtml = `
+                <div style="overflow-x: auto;">
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Показатель</th>
+                    `;
+            
+            // Заголовки столбцов (проекты)
+            projectNames.forEach(name => {
+                tableHtml += `<th style="text-align:right;">${name}</th>`;
+                tableHtml += `<th style="text-align:right;">% от оборота</th>`;
+            });
+            
+            tableHtml += `
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
+            // Для каждой строки данных (показателя)
+            const labels = [];
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const label = row[0]; // первый столбец - название показателя
+                if (!label || label === 'Дата сохранения') continue;
+                labels.push(label);
+            }
+
+            // Проходим по каждому показателю
+            labels.forEach(label => {
+                // Находим строку с этим показателем
+                let rowData = null;
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i][0] === label) {
+                        rowData = rows[i];
+                        break;
+                    }
+                }
+                if (!rowData) return;
+
+                const isTotal = label === 'Итого расходы';
+                const isProfit = label === 'Прибыль';
+
+                let trClass = '';
+                if (isTotal) trClass = 'total';
+                if (isProfit) trClass = 'profit';
+
+                tableHtml += `<tr class="${trClass}">`;
+                tableHtml += `<td>${label}</td>`;
+
+                // Для каждого проекта выводим сумму и процент
+                projectColumns.forEach(colIndex => {
+                    const value = rowData[colIndex];
+                    const formattedValue = typeof value === 'number' ? formatMoney(value) : (value || '0.00');
+                    
+                    // Находим оборот за вычетом для этого проекта (строка "Оборот за вычетом НДС+УСН (11%)")
+                    let turnoverNet = 0;
+                    for (let i = 0; i < rows.length; i++) {
+                        if (rows[i][0] === 'Оборот за вычетом НДС+УСН (11%)') {
+                            turnoverNet = parseFloat(rows[i][colIndex]) || 0;
+                            break;
+                        }
+                    }
+
+                    let percent = '—';
+                    if (label !== 'Оборот за вычетом НДС+УСН (11%)' && turnoverNet !== 0 && typeof value === 'number') {
+                        percent = formatPercent(value / turnoverNet);
+                    } else if (label === 'Оборот за вычетом НДС+УСН (11%)') {
+                        percent = '100.00%';
+                    }
+
+                    // Для количества сотрудников не показываем процент
+                    if (label.includes('Кол-во сотрудников')) {
+                        percent = '—';
+                    }
+
+                    tableHtml += `<td style="text-align:right;">${formattedValue}</td>`;
+                    tableHtml += `<td style="text-align:right;">${percent}</td>`;
+                });
+
+                tableHtml += `</tr>`;
+            });
+
+            tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            analyticsContainer.innerHTML = tableHtml;
+        }
+
+        // ---------- Уведомления ----------
         let toastTimeout = null;
         function showToast(message, type = '') {
             toast.textContent = message;
@@ -671,6 +1002,7 @@
             }, 4000);
         }
 
+        // ---------- Инициализация ----------
         (function setDefaultPeriod() {
             const now = new Date();
             monthSelect.value = now.getMonth() + 1;
@@ -685,6 +1017,15 @@
         calcBtn.addEventListener('click', calculate);
         clearBtn.addEventListener('click', clearAll);
         saveBtn.addEventListener('click', saveToGoogleSheets);
+        loadAnalyticsBtn.addEventListener('click', loadAnalytics);
+
+        // Загружаем аналитику при первом переключении на вкладку
+        document.querySelector('.tab-btn[data-tab="analytics"]').addEventListener('click', function() {
+            if (analyticsContainer.querySelector('.loading') || analyticsContainer.innerHTML === '') {
+                // Если ещё не загружено, загружаем
+                loadAnalytics();
+            }
+        });
 
         calculate();
     })();
