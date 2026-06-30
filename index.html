@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рентабельность проекта — калькулятор</title>
     
-    <!-- Подключаем шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* ... весь стиль из предыдущей версии ... */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -35,7 +35,6 @@
             position: relative;
         }
 
-        /* Логотип */
         .ws-logo {
             position: absolute;
             top: 20px;
@@ -69,7 +68,6 @@
             line-height: 1.5;
         }
 
-        /* Вкладки */
         .tabs {
             display: flex;
             gap: 8px;
@@ -448,7 +446,6 @@
 <body>
 
 <div class="container">
-    <!-- Логотип -->
     <div class="ws-logo">
         <img src="logo.png" alt="Логотип" style="height: 40px; width: auto;">
     </div>
@@ -456,13 +453,11 @@
     <h1>📊 Рентабельность проекта</h1>
     <div class="subtitle">Введите данные — все расчёты обновляются автоматически</div>
 
-    <!-- Вкладки -->
     <div class="tabs">
         <button class="tab-btn active" data-tab="calculator">📝 Калькулятор</button>
         <button class="tab-btn" data-tab="analytics">📈 Аналитика</button>
     </div>
 
-    <!-- Вкладка: Калькулятор -->
     <div id="tab-calculator" class="tab-content active">
         <div class="top-panel">
             <label>
@@ -567,7 +562,6 @@
         </div>
     </div>
 
-    <!-- Вкладка: Аналитика -->
     <div id="tab-analytics" class="tab-content">
         <div class="analytics-controls">
             <label>
@@ -600,7 +594,6 @@
 
 <script>
     (function() {
-        // ---------- Элементы ----------
         const inputs = {
             turnover: document.getElementById('turnover'),
             salaryOperators: document.getElementById('salaryOperators'),
@@ -623,16 +616,13 @@
         const saveBtn = document.getElementById('saveBtn');
         const toast = document.getElementById('toast');
 
-        // Элементы для аналитики
         const analyticsContainer = document.getElementById('analyticsContainer');
         const loadAnalyticsBtn = document.getElementById('loadAnalyticsBtn');
         const analyticsProjectFilter = document.getElementById('analyticsProjectFilter');
 
-        // Вкладки
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        // ---------- Работа с вкладками ----------
         tabBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 const tabId = this.dataset.tab;
@@ -643,7 +633,6 @@
             });
         });
 
-        // ---------- Вспомогательные функции ----------
         function formatMoney(value) {
             if (isNaN(value)) return '0.00';
             const rounded = Math.round(value * 100) / 100;
@@ -671,7 +660,6 @@
             };
         }
 
-        // ---------- Основной расчёт ----------
         function calculate() {
             const v = getValues();
 
@@ -751,7 +739,6 @@
             window._lastRawValues = v;
         }
 
-        // ---------- Очистка ----------
         function clearAll() {
             for (let key in inputs) {
                 inputs[key].value = 0;
@@ -763,7 +750,6 @@
             showToast('Все поля очищены', '');
         }
 
-        // ---------- Сохранение в Google Таблицу ----------
         function saveToGoogleSheets() {
             if (!window._lastItems) {
                 calculate();
@@ -800,7 +786,7 @@
             data.raw_employeesOffice = v.employeesOffice;
 
             const formData = new URLSearchParams(data).toString();
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzaGk3i6dAn13F5TNh0TI0UBquoFIeQQSKcuQfjcrsIc_f9A6vHyCSg99wR0MFLhFlQRQ/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -819,45 +805,42 @@
             });
         }
 
-        // ---------- Загрузка аналитики ----------
-       function loadAnalytics() {
-    analyticsContainer.innerHTML = '<div class="loading">⏳ Загрузка данных...</div>';
-    
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
+        function loadAnalytics() {
+            analyticsContainer.innerHTML = '<div class="loading">⏳ Загрузка данных...</div>';
+            
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
 
-    // Отправляем POST-запрос с параметром action=get
-    fetch(scriptURL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=get'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('HTTP error! status: ' + response.status);
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=get'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                renderAnalytics(data);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки:', error);
+                analyticsContainer.innerHTML = `
+                    <div class="loading" style="color: #d95b5b;">
+                        ❌ Ошибка загрузки данных: ${error.message}<br>
+                        <small>Проверьте, что скрипт Google Apps Script опубликован и доступен.</small>
+                    </div>
+                `;
+                showToast('❌ Ошибка загрузки аналитики', 'error');
+            });
         }
-        return response.json();
-    })
-    .then(data => {
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        renderAnalytics(data);
-    })
-    .catch(error => {
-        console.error('Ошибка загрузки:', error);
-        analyticsContainer.innerHTML = `
-            <div class="loading" style="color: #d95b5b;">
-                ❌ Ошибка загрузки данных: ${error.message}<br>
-                <small>Проверьте, что скрипт Google Apps Script опубликован и доступен.</small>
-            </div>
-        `;
-        showToast('❌ Ошибка загрузки аналитики', 'error');
-    });
-}
 
-        // ---------- Отрисовка аналитики ----------
         function renderAnalytics(data) {
             const headers = data.headers;
             const rows = data.rows;
@@ -867,16 +850,13 @@
                 return;
             }
 
-            // Фильтр по проекту
             const filterProject = analyticsProjectFilter.value;
             
-            // Находим индексы столбцов с проектами
             const projectColumns = [];
             const projectNames = [];
             for (let i = 0; i < headers.length; i++) {
                 const header = headers[i];
                 if (header && header !== 'Показатель' && header !== 'Дата сохранения') {
-                    // Формат: "Дайсон, Март 2026"
                     const projectMatch = header.match(/^([^,]+)/);
                     if (projectMatch) {
                         const projectName = projectMatch[1].trim();
@@ -898,7 +878,6 @@
                 return;
             }
 
-            // Строим таблицу
             let tableHtml = `
                 <div style="overflow-x: auto;">
                     <table class="result-table">
@@ -907,7 +886,6 @@
                                 <th>Показатель</th>
                     `;
             
-            // Заголовки столбцов (проекты)
             projectNames.forEach(name => {
                 tableHtml += `<th style="text-align:right;">${name}</th>`;
                 tableHtml += `<th style="text-align:right;">% от оборота</th>`;
@@ -919,18 +897,15 @@
                         <tbody>
                     `;
 
-            // Для каждой строки данных (показателя)
             const labels = [];
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                const label = row[0]; // первый столбец - название показателя
+                const label = row[0];
                 if (!label || label === 'Дата сохранения') continue;
                 labels.push(label);
             }
 
-            // Проходим по каждому показателю
             labels.forEach(label => {
-                // Находим строку с этим показателем
                 let rowData = null;
                 for (let i = 0; i < rows.length; i++) {
                     if (rows[i][0] === label) {
@@ -950,12 +925,10 @@
                 tableHtml += `<tr class="${trClass}">`;
                 tableHtml += `<td>${label}</td>`;
 
-                // Для каждого проекта выводим сумму и процент
                 projectColumns.forEach(colIndex => {
                     const value = rowData[colIndex];
                     const formattedValue = typeof value === 'number' ? formatMoney(value) : (value || '0.00');
                     
-                    // Находим оборот за вычетом для этого проекта (строка "Оборот за вычетом НДС+УСН (11%)")
                     let turnoverNet = 0;
                     for (let i = 0; i < rows.length; i++) {
                         if (rows[i][0] === 'Оборот за вычетом НДС+УСН (11%)') {
@@ -971,7 +944,6 @@
                         percent = '100.00%';
                     }
 
-                    // Для количества сотрудников не показываем процент
                     if (label.includes('Кол-во сотрудников')) {
                         percent = '—';
                     }
@@ -992,7 +964,6 @@
             analyticsContainer.innerHTML = tableHtml;
         }
 
-        // ---------- Уведомления ----------
         let toastTimeout = null;
         function showToast(message, type = '') {
             toast.textContent = message;
@@ -1004,7 +975,6 @@
             }, 4000);
         }
 
-        // ---------- Инициализация ----------
         (function setDefaultPeriod() {
             const now = new Date();
             monthSelect.value = now.getMonth() + 1;
@@ -1021,10 +991,8 @@
         saveBtn.addEventListener('click', saveToGoogleSheets);
         loadAnalyticsBtn.addEventListener('click', loadAnalytics);
 
-        // Загружаем аналитику при первом переключении на вкладку
         document.querySelector('.tab-btn[data-tab="analytics"]').addEventListener('click', function() {
-            if (analyticsContainer.querySelector('.loading') || analyticsContainer.innerHTML === '') {
-                // Если ещё не загружено, загружаем
+            if (analyticsContainer.querySelector('.loading') && analyticsContainer.innerHTML.includes('Нажмите')) {
                 loadAnalytics();
             }
         });
