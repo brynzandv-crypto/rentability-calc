@@ -820,40 +820,42 @@
         }
 
         // ---------- Загрузка аналитики ----------
-        function loadAnalytics() {
-            analyticsContainer.innerHTML = '<div class="loading">⏳ Загрузка данных...</div>';
-            
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
+       function loadAnalytics() {
+    analyticsContainer.innerHTML = '<div class="loading">⏳ Загрузка данных...</div>';
+    
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxXEEPT9Z-7_TF3Q2cp_lcH340WouXP780gULzxTdQ8Lvkldo6-trAJBetcRqgqNYj5CQ/exec';
 
-            fetch(scriptURL, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP error! status: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                renderAnalytics(data);
-            })
-            .catch(error => {
-                console.error('Ошибка загрузки:', error);
-                analyticsContainer.innerHTML = `
-                    <div class="loading" style="color: #d95b5b;">
-                        ❌ Ошибка загрузки данных: ${error.message}<br>
-                        <small>Проверьте, что скрипт Google Apps Script опубликован и доступен.</small>
-                    </div>
-                `;
-                showToast('❌ Ошибка загрузки аналитики', 'error');
-            });
+    // Отправляем POST-запрос с параметром action=get
+    fetch(scriptURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=get'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP error! status: ' + response.status);
         }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        renderAnalytics(data);
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки:', error);
+        analyticsContainer.innerHTML = `
+            <div class="loading" style="color: #d95b5b;">
+                ❌ Ошибка загрузки данных: ${error.message}<br>
+                <small>Проверьте, что скрипт Google Apps Script опубликован и доступен.</small>
+            </div>
+        `;
+        showToast('❌ Ошибка загрузки аналитики', 'error');
+    });
+}
 
         // ---------- Отрисовка аналитики ----------
         function renderAnalytics(data) {
